@@ -274,7 +274,7 @@ func (s *Server) handleGetDiagnostics(ctx context.Context, req mcp.CallToolReque
 	}
 
 	if wait {
-		provider.WaitForDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond)
+		provider.WaitForSettledDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond, diagnosticsQuietWindow)
 	}
 	diags, published := provider.LastDiagnostics(absPath)
 
@@ -635,6 +635,10 @@ func (s *Server) workspaceRootFor(absPath string) (string, error) {
 	}
 	return "", fmt.Errorf("no tracked repo contains %s: refusing to derive an LSP workspace from the daemon's working directory", absPath)
 }
+
+// diagnosticsQuietWindow is how long a server has to stay silent before a
+// waiting get_diagnostics trusts the last publish.
+const diagnosticsQuietWindow = 1500 * time.Millisecond
 
 // lspNoProviderResult returns a structured error for the "no LSP
 // available" common case so callers can branch on a stable

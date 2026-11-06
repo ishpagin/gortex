@@ -490,6 +490,8 @@ session.
 
 `published` says whether the server reported on the file at all. With
 `published: false` an empty list means "no answer yet", not "no errors".
+`wait: true` waits past the first publish until the server stays quiet, since
+tsserver can send an empty report just before the real one.
 
 ### Push (opt-in)
 
