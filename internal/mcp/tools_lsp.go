@@ -273,19 +273,18 @@ func (s *Server) handleGetDiagnostics(ctx context.Context, req mcp.CallToolReque
 		return mcp.NewToolResultError(fmt.Sprintf("open document: %v", err)), nil
 	}
 
-	var diags []lsp.Diagnostic
 	if wait {
-		diags = provider.WaitForDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond)
-	} else {
-		d, _ := provider.LastDiagnostics(absPath)
-		diags = d
+		provider.WaitForDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond)
 	}
+	diags, published := provider.LastDiagnostics(absPath)
 
 	return s.respondJSONOrTOON(ctx, req, map[string]any{
 		"path":        path,
 		"diagnostics": diagsToWire(diags),
 		"total":       len(diags),
 		"provider":    provider.Name(),
+		// false: the server has said nothing yet, an empty list is not "clean".
+		"published": published,
 	})
 }
 
