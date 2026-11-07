@@ -486,6 +486,11 @@ func (s *Server) lspProviderForPath(path string) (*lsp.Provider, string, error) 
 			if err != nil {
 				return nil, abs, err
 			}
+			if spec.WorkspaceGate != nil {
+				if err := spec.WorkspaceGate(root); err != nil {
+					return nil, abs, err
+				}
+			}
 			lp, err := r.ForSpecWorkspace(spec, root)
 			if err != nil {
 				return nil, abs, fmt.Errorf("router spawn %s: %w", spec.Name, err)
