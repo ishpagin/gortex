@@ -724,6 +724,26 @@ var Servers = []ServerSpec{
 		MaxParallel: 4,
 	},
 	{
+		// SFC diagnostics: tsserver with the Vue plugin inside, the setup the
+		// Vue language tools document for typescript-language-server. A spec
+		// of its own, not a .vue entry on the one above: tsgo takes .ts where
+		// it is installed and has no plugin API, and the plugin stays out of
+		// plain TS sessions. No Languages on purpose, so the eager enrichment
+		// sweep skips it and it runs only when a tool asks about a .vue file.
+		Name:       "vue-typescript",
+		Command:    "typescript-language-server",
+		Args:       []string{"--stdio"},
+		Extensions: []string{".vue"},
+		LanguageIDs: map[string]string{
+			".vue": "vue",
+		},
+		Priority:        5,
+		Daemon:          true,
+		MaxParallel:     4,
+		WorkspaceGate:   vueWorkspaceGate,
+		InitOptionsFunc: vueInitOptions,
+	},
+	{
 		Name:       "mql-lsp-server",
 		Command:    "mql-lsp-server",
 		Languages:  []string{"mql"},
