@@ -523,7 +523,7 @@ func (s *Server) lspProviderForPath(path string) (*lsp.Provider, string, error) 
 		}
 		return lp, abs, nil
 	}
-	return nil, abs, fmt.Errorf("no LSP provider registered for languages %v", spec.Languages)
+	return nil, abs, fmt.Errorf("no LSP provider for %s: %s is disabled or not on the daemon's PATH", spec.Name, spec.Command)
 }
 
 // lspRouter returns the semantic manager's LSP router as a concrete
