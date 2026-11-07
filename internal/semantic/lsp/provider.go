@@ -2538,6 +2538,7 @@ func (p *Provider) initializeClient(workspaceRoot string, start *providerClientS
 					RelatedInformation: true,
 					VersionSupport:     true,
 				},
+				Diagnostic: &DiagnosticCapability{},
 			},
 		},
 	}
@@ -2947,6 +2948,31 @@ func (p *Provider) LastDiagnostics(absPath string) ([]Diagnostic, bool) {
 	out := make([]Diagnostic, len(d))
 	copy(out, d)
 	return out, true
+}
+
+// PullDiagnostics asks the server for absPath's diagnostics with
+// textDocument/diagnostic. tsgo answers only this way and never pushes real
+// results. ok is false when the server has no pull support or the request
+// failed, and the caller falls back to what was pushed.
+func (p *Provider) PullDiagnostics(absPath string) (diags []Diagnostic, ok bool) {
+	if !p.Supports("textDocument/diagnostic") {
+		return nil, false
+	}
+	params := struct {
+		TextDocument TextDocumentIdentifier `json:"textDocument"`
+	}{TextDocumentIdentifier{URI: pathToURI(absPath)}}
+	// No previousResultId is sent, so the report is always kind "full".
+	var report struct {
+		Items []Diagnostic `json:"items"`
+	}
+	if err := p.callCurrentClient("textDocument/diagnostic", params, &report); err != nil {
+		p.logger.Debug("lsp: pull diagnostics failed", zap.String("path", absPath), zap.Error(err))
+		return nil, false
+	}
+	if p.servesCSharp() && csharpDiagFilterEnabled() {
+		return filterCSharpAdvisoryDiags(report.Items), true
+	}
+	return report.Items, true
 }
 
 // WaitForSettledDiagnostics waits for a publish, then until the server stays

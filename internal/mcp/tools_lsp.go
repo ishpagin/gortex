@@ -273,10 +273,13 @@ func (s *Server) handleGetDiagnostics(ctx context.Context, req mcp.CallToolReque
 		return mcp.NewToolResultError(fmt.Sprintf("open document: %v", err)), nil
 	}
 
-	if wait {
-		provider.WaitForSettledDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond, diagnosticsQuietWindow)
+	diags, published := provider.PullDiagnostics(absPath)
+	if !published {
+		if wait {
+			provider.WaitForSettledDiagnostics(absPath, time.Duration(timeoutMs)*time.Millisecond, diagnosticsQuietWindow)
+		}
+		diags, published = provider.LastDiagnostics(absPath)
 	}
-	diags, published := provider.LastDiagnostics(absPath)
 
 	return s.respondJSONOrTOON(ctx, req, map[string]any{
 		"path":        path,

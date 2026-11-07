@@ -493,6 +493,10 @@ session.
 `wait: true` waits past the first publish until the server stays quiet, since
 tsserver can send an empty report just before the real one.
 
+A server that advertises `diagnosticProvider` is asked directly with
+`textDocument/diagnostic`, which is how `tsgo` reports errors. `wait` plays no
+part there, the request itself returns the answer.
+
 ### Push (opt-in)
 
 `subscribe_diagnostics` opts the calling MCP session into

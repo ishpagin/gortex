@@ -65,7 +65,13 @@ type TextDocumentClientCapabilities struct {
 	TypeHierarchy      *TypeHierarchyCapability      `json:"typeHierarchy,omitempty"`
 	CodeAction         *CodeActionCapability         `json:"codeAction,omitempty"`
 	PublishDiagnostics *PublishDiagnosticsCapability `json:"publishDiagnostics,omitempty"`
+	Diagnostic         *DiagnosticCapability         `json:"diagnostic,omitempty"`
 	Synchronization    *SynchronizationCapability    `json:"synchronization,omitempty"`
+}
+
+// DiagnosticCapability advertises the pull model (textDocument/diagnostic).
+type DiagnosticCapability struct {
+	DynamicRegistration bool `json:"dynamicRegistration,omitempty"`
 }
 
 // SynchronizationCapability advertises didOpen/didChange support.
@@ -155,6 +161,7 @@ type ServerCapabilities struct {
 	CodeActionProvider     any                    `json:"codeActionProvider,omitempty"`
 	ExecuteCommandProvider *ExecuteCommandOptions `json:"executeCommandProvider,omitempty"`
 	TextDocumentSync       any                    `json:"textDocumentSync,omitempty"`
+	DiagnosticProvider     any                    `json:"diagnosticProvider,omitempty"`
 }
 
 // ExecuteCommandOptions tells which commands the server can execute.
