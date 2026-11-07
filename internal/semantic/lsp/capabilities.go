@@ -139,6 +139,8 @@ func staticServerSupports(caps *ServerCapabilities, method string) bool {
 	switch method {
 	case "textDocument/hover":
 		return caps.HoverProvider != nil
+	case "textDocument/diagnostic":
+		return caps.DiagnosticProvider != nil
 	case "textDocument/definition":
 		return caps.DefinitionProvider != nil
 	case "textDocument/references":
