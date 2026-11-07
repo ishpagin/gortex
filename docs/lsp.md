@@ -488,6 +488,9 @@ the LSP server produced for a file. Use it for one-shot reads, batch
 checks, or contexts where the agent doesn't maintain a long-lived
 session.
 
+`published` says whether the server reported on the file at all. With
+`published: false` an empty list means "no answer yet", not "no errors".
+
 ### Push (opt-in)
 
 `subscribe_diagnostics` opts the calling MCP session into
