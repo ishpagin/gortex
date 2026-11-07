@@ -2949,6 +2949,27 @@ func (p *Provider) LastDiagnostics(absPath string) ([]Diagnostic, bool) {
 	return out, true
 }
 
+// WaitForSettledDiagnostics waits for a publish, then until the server stays
+// quiet for the given window, all within timeout. tsserver reports a file in
+// stages, so the first publish can be an empty one that the real errors follow
+// moments later: stopping there reads as "clean". Read the outcome with
+// LastDiagnostics.
+func (p *Provider) WaitForSettledDiagnostics(absPath string, timeout, quiet time.Duration) {
+	deadline := time.Now().Add(timeout)
+	p.WaitForDiagnostics(absPath, timeout)
+	for {
+		window := min(quiet, time.Until(deadline))
+		if window <= 0 {
+			return
+		}
+		start := time.Now()
+		p.WaitForDiagnostics(absPath, window)
+		if time.Since(start) >= window {
+			return
+		}
+	}
+}
+
 // WaitForDiagnostics blocks until the server publishes the next
 // publishDiagnostics for absPath, or the timeout elapses (returning the
 // last known diagnostics if any). Callers register their interest
