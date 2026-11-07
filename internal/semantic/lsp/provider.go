@@ -338,6 +338,11 @@ func (p *Provider) effectiveInitOptions(workspaceRoot string) json.RawMessage {
 	if len(p.altInitOptions) > 0 {
 		return p.altInitOptions
 	}
+	if p.spec != nil && p.spec.InitOptionsFunc != nil {
+		if opts := p.spec.InitOptionsFunc(workspaceRoot); len(opts) > 0 {
+			return opts
+		}
+	}
 	return effectiveInitializationOptions(p.spec)
 }
 
